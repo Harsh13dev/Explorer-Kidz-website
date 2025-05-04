@@ -1,0 +1,603 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== '' && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter(row => row.some(filledCell));
+
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex((row, index) =>
+          row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explorer Kidz</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a href="#" class="logo">
+          <img src="assets/explorer_kidz_log.png" alt="Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+            <li class="nav-item"><a class="nav-link" href="#education">Programs</a></li>
+            <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+            <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+            <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Home Section -->
+  <section class="home" id="home">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6 content">
+          <h3>Welcome to Our <span>Explorer Kidz</span></h3>
+          <p>At Explorer Kidz, we go beyond being just a school. We are a vibrant space where fun-filled activities and
+            engaging programs nurture young minds.</p>
+          <!-- <div class="slider">
+      <img src="assets/education3.png" alt="Coffee Quote 1" class="img-fluid">
+    </div> -->
+          <a href="#about" class="btn">Learn More</a>
+        </div>
+        <div class="col-lg-6 image">
+          <img src="assets/img.jpg" alt="">
+        </div>
+      </div>
+    </div>
+    <div class="custom-shape-divider-bottom-1684324473">
+      <!-- <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+  <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" class="shape-fill"></path>
+</svg> -->
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <h1 class="heading"><span>about</span> US </h1>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 image">
+          <img src="assets/about.jpg" alt="" class="img-fluid">
+        </div>
+        <div class="col-lg-6 content">
+          <h3>Exploring, Growing, And Thriving Together</h3>
+          <p>Explorer Kidz formed in 2013, with the aim to build the future of our children. We believe building a
+            strong foundation in the new generation kidz by imbibing the best qualities which would live forever
+            culminating them in a good human being.</p>
+          <a href="#" class="btn">read more</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vision Mission Section -->
+  <section class="vision-mission">
+    <h1>Our <span>Vision and Mission</span></h1>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5 mb-4">
+          <div class="main">
+            <div class="service">
+              <div class="service-logo">
+                <img src="assets/mis1.png" alt="">
+              </div>
+              <h4>VISION</h4>
+              <p>"Our vision is to shape young learners into well-rounded human beings by cultivating kindness,
+                integrity, and a love for learning. We strive to provide a joyful, inclusive, and enriching early
+                education experience that prepares children for future success while ensuring they grow into individuals
+                who make a positive impact on the world."</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5 mb-4">
+          <div class="main">
+            <div class="service">
+              <div class="service-logo">
+                <img src="assets/mis1.png" alt="">
+              </div>
+              <h4>MISSION</h4>
+              <p>"At Explorer Kidz, we believe in building a strong foundation for the new generation by instilling
+                lifelong values and essential qualities. Through a nurturing and stimulating environment, we foster
+                curiosity, creativity, and confidence in young minds, guiding them toward becoming compassionate and
+                responsible individuals."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+ <section class="features" id="features">
+  <!-- Why Children Love Us -->
+  <div class="container">
+    <h3 class="title">Why Children Love Us</h3>
+    <div class="row">
+      <!-- Existing Points -->
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-swimming-pool feature-icon"></i>
+          <h4>Splash Pool</h4>
+          <p>Our splash pool offers safe water play, encouraging physical activity and pure joy under supervision.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-puzzle-piece feature-icon"></i>
+          <h4>Many Activities</h4>
+          <p>From art and music to outdoor games and storytelling, we offer a wide range of activities.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-gift feature-icon"></i>
+          <h4>Celebrations</h4>
+          <p>We celebrate festivals, birthdays, and milestones with color and joy, helping children in every step.</p>
+        </div>
+      </div>
+      <!-- New Points -->
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-smile feature-icon"></i>
+          <h4>Fun-Filled Learning Every Day</h4>
+          <p>Learning is an adventure with exciting daily activities that spark joy and curiosity.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-chalkboard-teacher feature-icon"></i>
+          <h4>Caring and Friendly Teachers</h4>
+          <p>Our teachers create a warm, supportive environment where children feel loved.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-paint-brush feature-icon"></i>
+          <h4>Creative Arts & Craft Time</h4>
+          <p>Children express themselves through fun and imaginative art projects.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-book-open feature-icon"></i>
+          <h4>Interactive Storytelling and Songs</h4>
+          <p>Engaging stories and music sessions that make learning magical.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-shield-alt feature-icon"></i>
+          <h4>Safe and Colorful Environment</h4>
+          <p>A vibrant space designed to keep children safe while they explore.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-gamepad feature-icon"></i>
+          <h4>Play-Based Learning Approach</h4>
+          <p>Learning through play helps children develop skills naturally.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-tree feature-icon"></i>
+          <h4>Exciting Outdoor Play Area</h4>
+          <p>Outdoor spaces for kids to run, play, and enjoy nature.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-flask feature-icon"></i>
+          <h4>Hands-On Science and Discovery</h4>
+          <p>Simple experiments that ignite a love for discovery.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-users feature-icon"></i>
+          <h4>Friendship and Social Skills</h4>
+          <p>Activities that teach sharing, teamwork, and friendship.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-trophy feature-icon"></i>
+          <h4>Celebration of Every Festival and Small Achievements</h4>
+          <p>We make every moment special, from festivals to small wins.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Parents Choose Us -->
+  <div class="container mt-5">
+    <h3 class="title">Why Parents Choose Us</h3>
+    <div class="row">
+      <!-- Existing Points -->
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-book feature-icon"></i>
+          <h4>Innovative Curriculum</h4>
+          <p>Our thoughtfully designed curriculum blends traditional learning with modern approaches to inspire critical thinking.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-users feature-icon"></i>
+          <h4>Dedicated Staff</h4>
+          <p>Our caring and qualified team is passionate about early childhood development, ensuring every child receives individual attention and support.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-child feature-icon"></i>
+          <h4>Holistic Development</h4>
+          <p>We focus on the all-round growth of your child — emotionally, socially, intellectually, and physically — laying a strong foundation for life.</p>
+        </div>
+      </div>
+      <!-- New Points -->
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-heart feature-icon"></i>
+          <h4>A Safe, Loving Environment</h4>
+          <p>Your child’s safety and happiness are our top priorities.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-chalkboard-teacher feature-icon"></i>
+          <h4>Experienced & Caring Educators</h4>
+          <p>Our teachers are trained, nurturing, and passionate about early childhood.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-hands-helping feature-icon"></i>
+          <h4>Holistic Development Approach</h4>
+          <p>We focus on emotional, social, physical, and cognitive growth.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-comments feature-icon"></i>
+          <h4>Strong Parent-School Communication</h4>
+          <p>Regular updates, feedback, and involvement keep you connected.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-school feature-icon"></i>
+          <h4>Clean, Hygienic & Child-Friendly Campus</h4>
+          <p>Designed with young children’s health and comfort in mind.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-book-open feature-icon"></i>
+          <h4>Age-Appropriate Learning Activities</h4>
+          <p>From phonics to fine motor skills — every activity has a purpose.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-user-friends feature-icon"></i>
+          <h4>Individual Attention for Every Child</h4>
+          <p>Small class sizes help us nurture each child’s unique personality.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-clock feature-icon"></i>
+          <h4>Convenient Timings & Flexible Options</h4>
+          <p>We support busy parents with practical scheduling.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-smile feature-icon"></i>
+          <h4>Happy Children, Happy Homes</h4>
+          <p>When children thrive, parents feel confident and content.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <i class="fas fa-star feature-icon"></i>
+          <h4>Trusted by Families in the Community</h4>
+          <p>A reputation built on years of love, care, and excellence.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Education Section -->
+  <section class="education" id="education">
+    <h1 class="heading">Our <span>Programs</span></h1>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3 mb-5">
+          <div class="box">
+            <h3>Play Group</h3>
+            <p>2 to 3 years Age Group</p>
+            <p>A nurturing environment for toddlers to explore, socialize, and develop early learning skills through fun
+              activities.</p>
+            <img src="assets/gallery-1.jpg" alt="">
+          </div>
+        </div>
+        <div class="col-md-3 mb-5">
+          <div class="box">
+            <h3>Nursery</h3>
+            <p>3-4 years Age group</p>
+            <p>A foundational stage focusing on basic motor skills, social interaction, and early learning through
+              play-based activities.</p>
+            <img src="assets/gallery-2.jpg" alt="">
+          </div>
+        </div>
+        <div class="col-md-3 mb-5">
+          <div class="box">
+            <h3>JR.KG</h3>
+            <p>4 to 5 years</p>
+            <p>Introduces structured learning with alphabets, numbers, and creative activities to build cognitive and
+              language skills.</p>
+            <img src="assets/gallery-5.jpg" alt="">
+          </div>
+        </div>
+        <div class="col-md-3 mb-5">
+          <div class="box">
+            <h3>SR.KG</h3>
+            <p>5 to 6 years</p>
+            <p>Prepares children for primary school with advanced literacy, numeracy, and problem-solving activities in
+              a fun, engaging way.</p>
+            <img src="assets/gallery-4.jpg" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="services" id="services">
+    <h1 class="heading">OUR <span>Services</span></h1>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/act1.webp" alt="">
+            <h3>Abc learning</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/act2.jpg" alt="">
+            <h3>Phonics Learning</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/activities3.png" alt="">
+            <h3>games and fun</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/activities4.png" alt="">
+            <h3>Art and Craft</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/activities5.png" alt="">
+            <h3>modern teaching aids</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/activities6.png" alt="">
+            <h3>child centric approach</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/activities7.png" alt="">
+            <h3>environmental consciousness</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box">
+            <img src="assets/activities8.png" alt="">
+            <h3>value education</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <!-- <section class="gallery" id="gallery"> -->
+  <h1 class="heading">OUR <span>Gallery</span></h1>
+  <!-- Carousel -->
+  <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="assets/gandi jayanti.jpg" class="d-block carousel-img" alt="Image 1">
+      </div>
+      <div class="carousel-item">
+        <img src="assets/grandparents.jpg" class="d-block carousel-img" alt="Image 2">
+      </div>
+      <div class="carousel-item">
+        <img src="assets/dads.jpg" class="d-block carousel-img" alt="Image 3">
+      </div>
+      <div class="carousel-item">
+        <img src="assets/independence.jpg" class="d-block carousel-img" alt="Image 4">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <!-- View Gallery Button -->
+  <div class="text-center mt-4 mb-4">
+    <a href="gallery.html" class="btn">View Gallery</a>
+  </div>
+  <!-- </section> -->
+
+  <!-- Contact Section -->
+  <!-- <section class="contact" id="contact">
+<h1 class="heading"><span>contact</span> US</h1>
+<div class="container">
+<div class="row">
+  <div class="col-md-4">
+    <div class="icons">
+      <i class="fas fa-clock"></i>
+      <h3>opening hours :</h3>
+      <p>mon - fri: 08:00 am to 2:00 pm</p>
+      <p>saturday: 10:00 am to 1:00 pm</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="icons">
+      <i class="fas fa-envelope"></i>
+      <h3>email</h3>
+      <p><a href="mailto:example@explorerkidz.com">example@explorerkidz.com</a></p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="icons">
+      <i class="fas fa-phone"></i>
+      <h3>phone number</h3>
+      <p>+91 9284206438</p>
+      <p>+91 8970836385</p>
+    </div>
+  </div>
+</div>
+</div>
+</section> -->
+
+  <!-- Footer Section -->
+  <section class="footer">
+    <div class="container">
+      <div class="row">
+        <!-- Column 1: School Name and Address -->
+        <div class="col-md-3">
+          <div class="box">
+            <h3><i class="fas fa-school"></i> EXPLORER KIDZ</h3>
+            <p>Dwaraka, S.No-59/2A/1, Prabhat Road Colony, Rahatni Link Road, Kalewadi, Pune-411017.</p>
+          </div>
+        </div>
+
+        <!-- Column 2: Quick Links -->
+        <div class="col-md-3">
+          <div class="box">
+            <h3>Quick Links</h3>
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="#about" class="footer-link">About</a>
+            <a href="#education" class="footer-link">Programs</a>
+            <a href="#services" class="footer-link">Services</a>
+            <a href="gallery.html" class="footer-link">Gallery</a>
+            <a href="contact.html" class="footer-link">Contact</a>
+          </div>
+        </div>
+
+        <!-- Column 3: Contact Information -->
+        <div class="col-md-3">
+          <div class="box">
+            <h3>Contact Info</h3>
+            <p><i class="fas fa-phone"></i> +91 9284206438</p>
+            <p><i class="fas fa-phone"></i> +91 8970836385</p>
+            <p><i class="fas fa-envelope"></i> example@explorerkidz.com</p>
+          </div>
+        </div>
+
+        <!-- Column 4: Social Media -->
+        <div class="col-md-3">
+          <div class="box">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+              <a href="https://facebook.com" target="_blank" class="social-link"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://instagram.com" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
+              <a href="https://twitter.com" target="_blank" class="social-link"><i class="fab fa-twitter"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="credit"> Copyright 2025 | <span>Explorer Kidz Preschool</span> | All Rights Reserved</div>
+  </section>
+
+  <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/+919689871765?text=Hello,%20I’d%20like%20to%20know%20more%20about%20Explorer%20Kidz!" target="_blank" class="whatsapp-float">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <!-- Custom JS -->
+  <script src="script.js"></script>
+</body>
+
+</html>
